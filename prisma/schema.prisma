@@ -1,0 +1,47 @@
+// This is your Prisma schema file
+// Learn more about it at https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
+}
+
+model Content {
+  id        String           @id @default(cuid())
+  body      String
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id])
+  variants  ContentVariant[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model ContentVariant {
+  id        String   @id @default(cuid())
+  platform  Platform
+  body      String
+  contentId String
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+enum Platform {
+  TWITTER
+  LINKEDIN
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+}
